@@ -1,0 +1,10 @@
+.board
+{
+    background: url('./assets/board.png');
+    background-repeat: no-repeat;
+    width: 405px;
+    height: 407px;
+    position: relative;
+    margin: 0 auto;
+    margin-top: 5rem;
+}

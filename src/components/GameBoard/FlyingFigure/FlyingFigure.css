@@ -1,0 +1,10 @@
+.flying-figure
+{
+    position: fixed;
+    background-color: #000;
+    width: 20px;
+    height: 20px;
+    box-shadow: #000 0px 0px 10px;
+    border-radius: 20px;
+    opacity: 0.9;
+}

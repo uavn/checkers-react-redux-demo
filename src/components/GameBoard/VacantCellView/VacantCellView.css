@@ -1,0 +1,13 @@
+.vacant-cell
+{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+}
+
+.cell-highlighted
+{
+    box-shadow: 0 0 10px #FFA500;
+    background: rgb(255, 165, 0, 0.4);
+    border-radius: 30px;
+}

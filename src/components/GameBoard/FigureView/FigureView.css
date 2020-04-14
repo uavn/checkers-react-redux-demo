@@ -1,0 +1,35 @@
+.figure
+{
+    background: url('./assets/checkers.png');
+    background-repeat: no-repeat;
+
+    width: 30px;
+    height: 30px;
+    position: absolute;
+}
+
+.figure-white
+{
+    background-position: -97px 0;
+}
+
+.figure-black
+{
+    background-position: -65px 0;
+}
+
+.figure-black.figure-queen
+{
+    background-position: -1px 0;
+}
+
+.figure-white.figure-queen
+{
+    background-position: -33px 0;
+}
+
+.figure-highlighted
+{
+    box-shadow: 0 0 10px #FFA500;
+    border-radius: 30px;
+}

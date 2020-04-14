@@ -1,0 +1,148 @@
+.list-block 
+{
+    margin: 0 auto;
+    width: 720px;
+    height: 960px;
+    background-image: url('./assets/bg.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.list-head
+{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 122px;
+    color: #333;
+    font-size: 2em;
+}
+
+.games-list 
+{
+    position: absolute;
+    top: 190px;
+    left: 120px;
+    bottom: 220px;
+    right: 120px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    white-space: nowrap;
+    color: #333;
+}
+
+.list-item
+{
+    line-height: 50px;
+    height: 50px;
+    padding: 0 20px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.list-item:hover
+{
+    opacity: 0.8;
+    background-color: rgba(47, 79, 79, 0.2);
+}
+
+.btn:hover
+{
+    opacity: 0.9;
+    color: #eee;
+}
+
+.btn-create-game
+{
+    background: url('./assets/btn.png');
+    position: absolute;
+    text-decoration: none;
+    color: #333;
+    width: 162px;
+    height: 98px;
+    line-height: 98px;
+    display: inline-block;
+    bottom: 116px;
+    left: 121px;
+    background-repeat: no-repeat;
+    text-align: center;
+    color: #333;
+    font-size: 1.4em;
+}
+
+.btn-local-game
+{
+    background: url('./assets/btn.png');
+    position: absolute;
+    text-decoration: none;
+    color: #333;
+    width: 162px;
+    height: 98px;
+    line-height: 98px;
+    display: inline-block;
+    bottom: 116px;
+    right: 121px;
+    background-repeat: no-repeat;
+    text-align: center;
+    color: #333;
+    font-size: 1.4em;
+}
+
+.no-games
+{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 215px;
+    color: #333;
+    font-size: 2em;
+}
+
+/* width */
+::-webkit-scrollbar 
+{
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track 
+{
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb 
+{
+    background: #333;
+    border-radius: 5px;
+
+    background-color: #2F4F4F;
+	background-image: -webkit-linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 0, 0, 0.7) 50%,
+        transparent,
+        transparent
+    )
+}   
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover 
+{
+    cursor: pointer;
+    background-color: #2F4F4F;
+	background-image: -webkit-linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 0, 0, 1) 50%,
+        transparent,
+        transparent
+    )
+}

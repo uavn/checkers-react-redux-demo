@@ -15,7 +15,7 @@ export default class Game
      */
     constructor(
         name, 
-        userId, 
+        userId = null, 
         id = 0, 
         time = moment(), 
         started = false, 
@@ -23,7 +23,7 @@ export default class Game
         ingame = false
     ) {
         this.name = name
-        this.userId = userId
+        this.userId = userId || this.getUserId()
         this.id = id
         this.time = time
         this.started = started
@@ -33,7 +33,6 @@ export default class Game
     }
 
     /**
-     * 
      * @param {Object} steps 
      */
     setSteps(steps) {
@@ -62,7 +61,6 @@ export default class Game
     }
 
     /**
-     * 
      * @param {Object} param
      * @return {Game}
      */
@@ -81,5 +79,19 @@ export default class Game
      */
     isMy() {
         return this.userId === localStorage.getItem('userId')
+    }
+
+    /**
+     * @returns {string}
+     */
+    getUserId() {
+        let userId = localStorage.getItem('userId')
+
+        if (!userId) {
+            userId = [...Array(10)].map( i =>(~~(Math.random()*36)).toString(36)).join('')
+            localStorage.setItem('userId', userId)
+        }
+
+        return userId
     }
 }

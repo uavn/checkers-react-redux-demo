@@ -173,7 +173,7 @@ class GameBoard extends React.Component {
                 }
             },
 
-            [MultiplayerService.ERROR_APPEAR]: () => {
+            [MultiplayerService.ACTION_ERROR_APPEAR]: () => {
                 this.props.alertMessage('An error occured')
             },
         }

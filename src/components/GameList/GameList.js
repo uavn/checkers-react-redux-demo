@@ -42,7 +42,7 @@ class GameList extends React.Component
                 this.props.hideLoader()
             },
             
-            [MultiplayerService.ERROR_APPEAR]: (payload) => {
+            [MultiplayerService.ACTION_ERROR_APPEAR]: (payload) => {
                 alert(payload || 'An error occured')
             },
         }

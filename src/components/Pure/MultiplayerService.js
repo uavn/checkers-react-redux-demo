@@ -17,10 +17,7 @@ export default class MultiplayerService extends Observer
     static ACTION_GAME_STARTED = 'ACTION_GAME_STARTED'
     static ACTION_STEP_MADE = 'ACTION_STEP_MADE'
     static ACTION_STEP_SENT = 'ACTION_STEP_SENT'
-    static ERROR_APPEAR = 'ERROR_APPEAR'
-
-    /** @type {string} */
-    _userId
+    static ACTION_ERROR_APPEAR = 'ACTION_ERROR_APPEAR'
 
     /** @type {number} */
     _requestsCount = 100
@@ -28,13 +25,11 @@ export default class MultiplayerService extends Observer
     /** @type {number} */
     _gameRequestsCount = 1000
 
-    /** @type {Object} */
+    /** @type {Game} */
     _game = null
 
     constructor() {
         super()
-
-        this._userId = this.getUserId()
 
         this.subscribe((action) => {
             switch (action.type) {
@@ -45,20 +40,6 @@ export default class MultiplayerService extends Observer
                     break
             }
         })
-    }
-
-    /**
-     * @returns {string}
-     */
-    getUserId() {
-        let userId = localStorage.getItem('userId')
-
-        if (!userId) {
-            userId = [...Array(10)].map( i =>(~~(Math.random()*36)).toString(36)).join('')
-            localStorage.setItem('userId', userId)
-        }
-
-        return userId
     }
 
     /**
@@ -117,7 +98,7 @@ export default class MultiplayerService extends Observer
             }
         }).catch(err => {
             this.broadcast({
-                type: MultiplayerService.ERROR_APPEAR,
+                type: MultiplayerService.ACTION_ERROR_APPEAR,
                 payload: err
             })
         })
@@ -128,7 +109,7 @@ export default class MultiplayerService extends Observer
      */
     createGame(name) {
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
-        const game = new Game(name, this._userId)
+        const game = new Game(name)
 
         client.auth.loginWithCredential(new AnonymousCredential())
             .then(() =>
@@ -136,7 +117,7 @@ export default class MultiplayerService extends Observer
                     .insertOne({...game.toJson(), owner_id: client.auth.user.id})
             ).catch(err => {
                 this.broadcast({
-                    type: MultiplayerService.ERROR_APPEAR,
+                    type: MultiplayerService.ACTION_ERROR_APPEAR,
                     payload: err
                 })
             })
@@ -150,7 +131,7 @@ export default class MultiplayerService extends Observer
 
         if (game.isMy()) {
             this.broadcast({
-                type: MultiplayerService.ERROR_APPEAR,
+                type: MultiplayerService.ACTION_ERROR_APPEAR,
                 payload: 'Ви намагаєтесь приєднатись до своєї ж гри, зачекайте на суперника'
             })
 
@@ -170,7 +151,7 @@ export default class MultiplayerService extends Observer
             })
             .catch(err => {
                 this.broadcast({
-                    type: MultiplayerService.ERROR_APPEAR,
+                    type: MultiplayerService.ACTION_ERROR_APPEAR,
                     payload: err
                 })
             })
@@ -195,7 +176,7 @@ export default class MultiplayerService extends Observer
             })
             .catch(err => {
                 this.broadcast({
-                    type: MultiplayerService.ERROR_APPEAR,
+                    type: MultiplayerService.ACTION_ERROR_APPEAR,
                     payload: err
                 })
             })
@@ -230,7 +211,7 @@ export default class MultiplayerService extends Observer
 
             if (this._gameRequestsCount <= 0) {
                 this.broadcast({
-                    type: MultiplayerService.ERROR_APPEAR,
+                    type: MultiplayerService.ACTION_ERROR_APPEAR,
                     payload: 'Disconnected due to inactivity, please reload the page'
                 })
             } else {
@@ -240,7 +221,7 @@ export default class MultiplayerService extends Observer
             }
         }).catch(err => {
             this.broadcast({
-                type: MultiplayerService.ERROR_APPEAR,
+                type: MultiplayerService.ACTION_ERROR_APPEAR,
                 payload: err
             })
         })
@@ -270,7 +251,7 @@ export default class MultiplayerService extends Observer
             })
             .catch(err => {
                 this.broadcast({
-                    type: MultiplayerService.ERROR_APPEAR,
+                    type: MultiplayerService.ACTION_ERROR_APPEAR,
                     payload: err
                 })
             })

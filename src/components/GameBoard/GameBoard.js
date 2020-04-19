@@ -90,8 +90,6 @@ class GameBoard extends React.Component {
 
             [Board.ACTION_GAME_OVER]: (payload) => {
                 this.props.alertMessage(payload + ' wins')
-                
-                this.unsubscribeAllEvents()
             },
 
             [Board.ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE]: (payload) => {

@@ -27,12 +27,13 @@ function App({game, loading}) {
         <h4>Checkers Game</h4>
         JS Demo project.<br/>
         JavaScript, React & Redux<br/>
+        MongoDB Atlas/MongoDB Stitch<br/>
         Single Player/Multiplayer<br/>
 
         <br/>
 
-        Web: <a href="https://uartema.com" target="_blank">uartema.com</a> <br/>
-        GitHub: <a href="https://github.com/uavn/checkers-react-redux-demo" target="_blank">github.com/uavn/checkers-react-redux-demo</a> <br/>
+        Web: <a href="https://uartema.com" target="_blank" rel="noopener noreferrer">uartema.com</a> <br/>
+        GitHub: <a href="https://github.com/uavn/checkers-react-redux-demo" target="_blank" rel="noopener noreferrer">github.com/uavn/checkers-react-redux-demo</a> <br/>
         Mail: <a href="mailto:artbonvic@gmail.com">artbonvic@gmail.com</a>
       </div>
     </div>

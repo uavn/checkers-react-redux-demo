@@ -11,7 +11,8 @@ export const loaderReducer = (state = initialState, action) => {
         
         case HIDE_LOADER:
             return {...state, isVisible: false}
-    }
 
-    return state
+        default:
+            return state
+    }
 }

@@ -12,9 +12,9 @@ export default {
         }
 
         if (!this.dbs[dbName]) {
-            this.dbs[dbName] = this.client.
-                getServiceClient(RemoteMongoClient.factory, 'mongodb-atlas').
-                db(dbName)
+            this.dbs[dbName] = this.client
+                .getServiceClient(RemoteMongoClient.factory, 'mongodb-atlas')
+                .db(dbName)
         }
 
         return {client: this.client, db: this.dbs[dbName]}

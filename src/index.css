@@ -21,7 +21,7 @@ code {
     monospace;
 }
 
-.wrapper {
+.wrapper, button {
   font-family: 'Underdog', cursive;
 }
 

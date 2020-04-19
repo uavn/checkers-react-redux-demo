@@ -53,6 +53,24 @@
     background-color: rgba(47, 79, 79, 0.2);
 }
 
+.btn
+{
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.4em;
+    background-repeat: no-repeat;
+    text-align: center;
+    color: #333;
+    background: url('./assets/btn.png');
+    position: absolute;
+    text-decoration: none;
+    width: 162px;
+    height: 98px;
+    line-height: 98px;
+    display: inline-block;
+}
+
 .btn:hover
 {
     opacity: 0.9;
@@ -61,38 +79,14 @@
 
 .btn-create-game
 {
-    background: url('./assets/btn.png');
-    position: absolute;
-    text-decoration: none;
-    color: #333;
-    width: 162px;
-    height: 98px;
-    line-height: 98px;
-    display: inline-block;
     bottom: 116px;
     left: 121px;
-    background-repeat: no-repeat;
-    text-align: center;
-    color: #333;
-    font-size: 1.4em;
 }
 
 .btn-local-game
 {
-    background: url('./assets/btn.png');
-    position: absolute;
-    text-decoration: none;
-    color: #333;
-    width: 162px;
-    height: 98px;
-    line-height: 98px;
-    display: inline-block;
     bottom: 116px;
     right: 121px;
-    background-repeat: no-repeat;
-    text-align: center;
-    color: #333;
-    font-size: 1.4em;
 }
 
 .no-games

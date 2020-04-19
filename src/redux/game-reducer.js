@@ -16,7 +16,8 @@ export const gameReducer = (state = initialState, action) => {
         
         case SET_GAME_LIST:
             return {...state, gameList: action.payload}
-    }
 
-    return state
+        default:
+            return state
+    }
 }

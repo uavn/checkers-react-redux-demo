@@ -41,6 +41,8 @@ export default class MultiplayerService extends Observer
                 case MultiplayerService.ACTION_GAME_STARTED:
                     this._game = action.payload
                     break
+                default:
+                    break
             }
         })
     }
@@ -70,15 +72,15 @@ export default class MultiplayerService extends Observer
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
 
         client.auth.loginWithCredential(new AnonymousCredential()).then(() =>
-            db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME).
-                find({
+            db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
+                .find({
                     time: {
                         $gt: moment().unix() - 5 * 60 // 5 min old games to show
                     },
                 }, {
                     limit: 100
-                }).
-                asArray()
+                })
+                .asArray()
         ).then(docs => {
             const games = docs.map(game => {
                 return Game.fromMongoDocument(game)
@@ -128,8 +130,8 @@ export default class MultiplayerService extends Observer
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
         const game = new Game(name, this._userId)
 
-        client.auth.loginWithCredential(new AnonymousCredential()).
-            then(() =>
+        client.auth.loginWithCredential(new AnonymousCredential())
+            .then(() =>
                 db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
                     .insertOne({...game.toJson(), owner_id: client.auth.user.id})
             ).catch(err => {
@@ -155,8 +157,8 @@ export default class MultiplayerService extends Observer
             return
         }
 
-        client.auth.loginWithCredential(new AnonymousCredential()).
-            then(() =>
+        client.auth.loginWithCredential(new AnonymousCredential())
+            .then(() =>
                 db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
                     .updateOne({_id: new BSON.ObjectId(game.id)}, {$set: {started: true}})
             )
@@ -180,8 +182,8 @@ export default class MultiplayerService extends Observer
     flagGame(game) {
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
 
-        client.auth.loginWithCredential(new AnonymousCredential()).
-            then(() =>
+        client.auth.loginWithCredential(new AnonymousCredential())
+            .then(() =>
                 db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
                     .updateOne({_id: new BSON.ObjectId(game.id)}, {$set: {ingame: true}})
             )
@@ -212,8 +214,8 @@ export default class MultiplayerService extends Observer
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
 
         client.auth.loginWithCredential(new AnonymousCredential()).then(() =>
-            db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME).
-                findOne({
+            db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
+                .findOne({
                     _id: new BSON.ObjectId(gameId)
                 })
         ).then(doc => {
@@ -251,8 +253,8 @@ export default class MultiplayerService extends Observer
         const {client, db} = mongo.getMongo(MultiplayerService.MONGO_ATLAS_REMOTE_DB_NAME)
         const step = {from, to, color}
 
-        client.auth.loginWithCredential(new AnonymousCredential()).
-            then(() =>
+        client.auth.loginWithCredential(new AnonymousCredential())
+            .then(() =>
                 db.collection(MultiplayerService.MONGO_ATLAS_REMOTE_COLLECTION_NAME)
                     .updateOne(
                         {_id: new BSON.ObjectId(gameId)}, 

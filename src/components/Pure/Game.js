@@ -1,5 +1,4 @@
 import moment from "moment"
-import Moment from "react-moment"
 
 /** @class */
 export default class Game 
@@ -45,16 +44,21 @@ export default class Game
      * @returns {Object}
      */
     toJson() {
-        return {
+        let game = {
             name: this.name,
             userId: this.userId,
-            id: this.id,
             time: this.time.unix(),
             started: this.started,
             steps: this.steps,
             local: this.local,
             ingame: this.ingame,
         }
+
+        if (this.id) {
+            game.id = this.id
+        }
+
+        return game
     }
 
     /**

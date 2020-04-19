@@ -628,17 +628,17 @@ export default class Board  extends Observer
     _getVacantCells() {
         let vacantCells = []
 
-        for (let [i, row] of Object.entries(this._cells)) {
-            for (let [j, cell] of Object.entries(row)) {
+        Object.values(this._cells).forEach(row => {
+            Object.values(row).forEach(cell => {
                 if (cell instanceof VacantCell) {
                     vacantCells.push(cell)
                 }
-            }
-        }
-
+            })
+        })
+        
         return vacantCells
     }
-
+    
     /**
      * @param {string} color
      * 
@@ -646,14 +646,14 @@ export default class Board  extends Observer
      */
     _getTeamFigures(color) {
         let teamFigures = []
-
-        for (let [i, row] of Object.entries(this._cells)) {
-            for (let [j, cell] of Object.entries(row)) {
+        
+        Object.values(this._cells).forEach(row => {
+            Object.values(row).forEach(cell => {
                 if (cell instanceof Figure && cell.color === color) {
                     teamFigures.push(cell)
                 }
-            }
-        }
+            })
+        })
 
         return teamFigures
     }

@@ -63,11 +63,12 @@ class GameList extends React.Component
     createGame(e) {
         e.preventDefault()
 
-        let games = this.props.gameList
-        let name = prompt('Назва гри') || `Нова гра ${games.length ? games.length : ''}`
+        let name = prompt('Назва гри')
 
-        this.props.showLoader()
-        this.multiplayerService.createGame(name)
+        if (name && name.trim()) {
+            this.props.showLoader()
+            this.multiplayerService.createGame(name)
+        }
     }
 
     /**
@@ -110,8 +111,8 @@ class GameList extends React.Component
                     <div className="no-games">Немає створених ігор</div>
                 }
     
-                <a className="btn btn-create-game" href="#" onClick={(e) => {this.createGame(e)}}>Створити гру</a>
-                <a className="btn btn-local-game" href="#" onClick={(e) => {this.createLocalGame(e)}}>Локальна гра</a>
+                <button className="btn btn-create-game" onClick={(e) => {this.createGame(e)}}>Створити гру</button>
+                <button className="btn btn-local-game" onClick={(e) => {this.createLocalGame(e)}}>Локальна гра</button>
             </div>
         )
     }

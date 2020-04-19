@@ -95,7 +95,7 @@ class GameBoard extends React.Component {
             [Board.ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE]: (payload) => {
                 this.props.alertMessage(MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE)
 
-                payload.map(figure => {
+                payload.forEach(figure => {
                     figure.highlight()
 
                     setTimeout(() => {
@@ -113,7 +113,7 @@ class GameBoard extends React.Component {
             [Board.ACTION_MESSAGE_YOU_SHOULD_BEAT]: (payload) => {
                 this.props.alertMessage(MESSAGE_YOU_SHOULD_BEAT)
 
-                payload.map(cell => {
+                payload.forEach(cell => {
                     cell.highlight()
 
                     setTimeout(() => {
@@ -245,8 +245,8 @@ class GameBoard extends React.Component {
             <div className="board">
                 {this.state.takenFigure && <FlyingFigure figure={this.state.takenFigure}/>}
 
-                {this.props.cells && Object.entries(this.props.cells).map(([i, row]) => {
-                    return Object.entries(row).map(([j, cell]) => {
+                {this.props.cells && Object.values(this.props.cells).map(row => {
+                    return Object.values(row).map(cell => {
                         if (cell instanceof Figure) {
                             return <FigureView 
                                 key={cell.id}

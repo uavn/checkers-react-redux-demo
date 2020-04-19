@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import './GameList.css'
-import {selectGame, setGameList, showLoader, hideLoader} from './../../redux/actions'
+import {selectGame, setGameList, showLoader, hideLoader, alertMessage} from './../../redux/actions'
 import MultiplayerService from '../Pure/MultiplayerService'
 
 /** @class */
@@ -22,9 +22,9 @@ class GameList extends React.Component
         this.multiplayerService = new MultiplayerService()
 
         let eventCallbackMap = {
-            [MultiplayerService.ACTION_GAMES_ADDED]: (payload) => {
-                if (payload.games) {
-                    this.props.setGameList(payload.games)
+            [MultiplayerService.ACTION_GAMES_ADDED]: (games) => {
+                if (games) {
+                    this.props.setGameList(games)
                 }
                 
                 this.props.hideLoader()
@@ -36,14 +36,14 @@ class GameList extends React.Component
                 this.props.hideLoader()
             },
 
-            [MultiplayerService.ACTION_GAME_STARTED]: (payload) => {
+            [MultiplayerService.ACTION_GAME_STARTED]: (game) => {
                 // You connected to a game or somebody connected to your game
-                this.props.selectGame(payload)
+                this.props.selectGame(game)
                 this.props.hideLoader()
             },
             
-            [MultiplayerService.ERROR_APPEAR]: () => {
-                this.props.alertMessage('An error occured')
+            [MultiplayerService.ERROR_APPEAR]: (payload) => {
+                alert(payload || 'An error occured')
             },
         }
 
@@ -89,12 +89,6 @@ class GameList extends React.Component
     startGame(e, game) {
         e.preventDefault()
 
-        if (game.userId === this.userId) {
-            alert('Ви намагаєтесь приєднатись до своєї ж гри, зачекайте на суперника')
-            return
-        }
-
-        this.props.showLoader()
         this.multiplayerService.startGame(game)
     }
 
@@ -106,9 +100,9 @@ class GameList extends React.Component
                 {this.props.gameList.length 
                     ?
                     <div className="games-list">
-                        {this.props.gameList.map((game, id) => {
+                        {this.props.gameList.map(game => {
                             return (
-                                <div className="list-item" key={id} onClick={(e) => {this.startGame(e, game)}}>{game.name}</div>
+                                <div className="list-item" key={game.id} onClick={(e) => {this.startGame(e, game)}}>{game.name}</div>
                             )
                         })}
                     </div>
@@ -133,5 +127,6 @@ export default connect(mapStateToProps, {
     selectGame, 
     setGameList,
     showLoader,
-    hideLoader
+    hideLoader,
+    alertMessage
 })(GameList)

@@ -42,8 +42,7 @@ class GameBoard extends React.Component {
     }
 
     componentWillUnmount() {
-        this.board.unsubscribeAll()
-        this.multiplayerService.unsubscribeAll()
+        this.unsubscribeAllEvents()
     }
 
     initBoard() {
@@ -91,6 +90,8 @@ class GameBoard extends React.Component {
 
             [Board.ACTION_GAME_OVER]: (payload) => {
                 this.props.alertMessage(payload + ' wins')
+                
+                this.unsubscribeAllEvents()
             },
 
             [Board.ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE]: (payload) => {
@@ -157,11 +158,11 @@ class GameBoard extends React.Component {
 
     initMultiplayer() {
         let mpEventCallbackMap = {
-            [MultiplayerService.ACTION_STEP_MADE]: (payload) => {
-                if (payload.game && payload.game.steps && payload.game.steps.length) {
-                    for (let idx = (this.lastRemoteStepIdx + 1); idx < payload.game.steps.length; idx++) {
+            [MultiplayerService.ACTION_STEP_MADE]: (game) => {
+                if (game && game.steps && game.steps.length) {
+                    for (let idx = (this.lastRemoteStepIdx + 1); idx < game.steps.length; idx++) {
                         this.lastRemoteStepIdx = idx
-                        let step = payload.game.steps[idx]
+                        let step = game.steps[idx]
 
                         if (step.color && this.board.getMyColor() !== step.color) {
                             this.board.makeStep(step.from, step.to)
@@ -186,6 +187,11 @@ class GameBoard extends React.Component {
         })
 
         this.listenServer()
+    }
+
+    unsubscribeAllEvents() {
+        this.board.unsubscribeAll()
+        this.multiplayerService.unsubscribeAll()
     }
 
     dropAway() {

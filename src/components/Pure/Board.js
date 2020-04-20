@@ -59,6 +59,11 @@ export default class Board  extends Observer
     _map = []
 
     /**
+     * @type {Figure}
+     */
+    _requiredFigure
+
+    /**
      * @param {Object} params 
      */
     constructor({amIPlayWhite, localGame, boardMargins, cellSize, map}) {
@@ -76,6 +81,8 @@ export default class Board  extends Observer
             // Init board from map
             for (let row = 0; row < Board.BOARD_SIZE; row++) {
                 for (let col = 0; col < Board.BOARD_SIZE; col++) {
+                    if (!this._cells[row]) this._cells[row] = {}
+
                     if (!this._isWhiteCell(row, col)) {
                         let mapVal = this._map[row].replace(/\s/g, '').split('')[col]
     
@@ -94,9 +101,10 @@ export default class Board  extends Observer
                             cell = this._createFigure(row, col, false, Figure.BLACK)
                             cell.upgradeToQueen()
                         }
-    
-                        if (!this._cells[row]) this._cells[row] = {}
+                        
                         this._cells[row][col] = cell
+                    } else {
+                        this._cells[row][col] = null
                     }
                 }
             }
@@ -104,11 +112,14 @@ export default class Board  extends Observer
             // Default init
             for (let row = 0; row < Board.BOARD_SIZE; row++) {
                 for (let col = 0; col < Board.BOARD_SIZE; col++) {
+                    if (!this._cells[row]) this._cells[row] = {}
+
                     if (!this._isWhiteCell(row, col)) {
                         let cell = this._initCell(row, col)
                         
-                        if (!this._cells[row]) this._cells[row] = {}
                         this._cells[row][col] = cell.figure || cell.vacantCell
+                    } else {
+                        this._cells[row][col] = null
                     }
                 }
             }
@@ -129,33 +140,26 @@ export default class Board  extends Observer
     canThisStepBeDone(figure, vacantCell) {
         if (!figure.isCurrentPlayer() && !this._localGame) {
             // If player wants to make a step by enemy figure - he can't
-            this.broadcast({
-                type: Board.ACTION_MESSAGE,
-                payload: MESSAGE_THIS_IS_NOT_YOUR_FIGURE
-            })
+            this._log(MESSAGE_THIS_IS_NOT_YOUR_FIGURE)
 
             return false
         }
 
         if (figure.color !== this._whoseMove) {
             // If player wants to make a step by enemy figure - he can't
-            this.broadcast({
-                type: Board.ACTION_MESSAGE,
-                payload: MESSAGE_THIS_IS_NOT_YOUR_STEP
-            })
+            this._log(MESSAGE_THIS_IS_NOT_YOUR_STEP)
 
             return false
         }
 
         // If there are figures that should fight - allow only those figures
-        let figuresThatShouldFight = this._getFiguresThatShouldFight(figure)
+        let figuresThatShouldFight = this._requiredFigure 
+            ? [this._requiredFigure] 
+            : this._getFiguresThatShouldFight(figure)
 
         // If there is a figure, that should fight, and it is not the current figure - step denied
         if (figuresThatShouldFight.length && !figuresThatShouldFight.includes(figure)) {
-            this.broadcast({
-                type: Board.ACTION_MESSAGE,
-                payload: MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE
-            })
+            this._log(MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE)
 
             this.broadcast({
                 type: Board.ACTION_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE,
@@ -171,7 +175,7 @@ export default class Board  extends Observer
         let theOnlyPossibleSteps = []
 
         for (let enemy of enemies) {
-            let directions = this._getVacantCellsAfterEnemy(figure, enemy)
+            let directions = this._getVacantCellsAfterEnemy(figure, enemy, true)
 
             if (directions.length) {
                 theOnlyPossibleSteps = theOnlyPossibleSteps.concat(directions)
@@ -187,10 +191,7 @@ export default class Board  extends Observer
                 }
             }
 
-            this.broadcast({
-                type: Board.ACTION_MESSAGE,
-                payload: MESSAGE_YOU_SHOULD_BEAT
-            })
+            this._log(MESSAGE_YOU_SHOULD_BEAT)
 
             this.broadcast({
                 type: Board.ACTION_YOU_SHOULD_BEAT,
@@ -205,10 +206,7 @@ export default class Board  extends Observer
             return true
         }
 
-        this.broadcast({
-            type: Board.ACTION_MESSAGE,
-            payload: MESSAGE_YOU_CANT_GO_HERE
-        })
+        this._log(MESSAGE_YOU_CANT_GO_HERE)
 
         return false
     }
@@ -232,6 +230,8 @@ export default class Board  extends Observer
      * @param {VacantCell} vacantCell 
      */
     moveFigure(figure, vacantCell) {
+        this._requiredFigure = null
+
         let stepShortInfo = {
             color: figure.color,
 
@@ -255,15 +255,12 @@ export default class Board  extends Observer
             }
         }
 
-        this.broadcast({
-            type: Board.ACTION_MESSAGE,
-            payload: (
-                figure.color + ': ' +
-                this._convertColToChar(figure.col) + this._convertRowToNumber(figure.row) +
-                (this._deadFigures.length ? ':' : '') +
-                this._convertColToChar(vacantCell.col) + this._convertRowToNumber(vacantCell.row)
-            )
-        })
+        this._log(
+            figure.color + ': ' +
+            this._convertColToChar(figure.col) + this._convertRowToNumber(figure.row) +
+            (this._deadFigures.length ? ':' : '') +
+            this._convertColToChar(vacantCell.col) + this._convertRowToNumber(vacantCell.row)
+        )
 
         let figureRow = figure.row
         let figureCol = figure.col
@@ -290,25 +287,15 @@ export default class Board  extends Observer
 
         // If there are no more moves - change player, or if player beat the enemy and there are some more - player should continue his fight
         if (this._deadFigures.length && this._getEnemiesThatCanBeBeatenByFigure(figure).length) {
-            this.broadcast({
-                type: Board.ACTION_MESSAGE,
-                payload: MESSAGE_HEY_GO_BEAT_SOMEONE_MORE
-            })
+            this._requiredFigure = figure
+            this._log(MESSAGE_HEY_GO_BEAT_SOMEONE_MORE)
         } else {
             if (Figure.WHITE === this._whoseMove) {
                 this._whoseMove = Figure.BLACK
-
-                this.broadcast({
-                    type: Board.ACTION_MESSAGE,
-                    payload: MESSAGE_GO_BLACK
-                })
+                this._log(MESSAGE_GO_BLACK)
             } else {
                 this._whoseMove = Figure.WHITE
-
-                this.broadcast({
-                    type: Board.ACTION_MESSAGE,
-                    payload: MESSAGE_GO_WHITE
-                })
+                this._log(MESSAGE_GO_WHITE)
             }
 
             this._removeDeadFiguresFromTheBoard()
@@ -349,6 +336,17 @@ export default class Board  extends Observer
      */
     getMyColor() {
         return this._amIPlayWhite ? Figure.WHITE : Figure.BLACK
+    }
+
+    /**
+     * 
+     * @param {string} message 
+     */
+    _log(message) {
+        this.broadcast({
+            type: Board.ACTION_MESSAGE,
+            payload: message
+        })
     }
 
     /**
@@ -435,6 +433,13 @@ export default class Board  extends Observer
         return true
     }
 
+    _isOnTheSameDiagonal(figure, vacantCell) {
+        // If cell is on same diag as figure - allow, otherwise - not
+        let k = Math.abs((figure.row * 10 + figure.col) - (vacantCell.row * 10 + vacantCell.col))
+
+        return (0 === (k % 11)) || (0 === (k % 9))
+    }
+
     /**
      * @param {Figure} figure 
      * @param {VacantCell} vacantCell 
@@ -443,10 +448,7 @@ export default class Board  extends Observer
      */
     _isCellAvailableForTheFigure(figure, vacantCell) {
         if (this._canCellBeJumpedTo(figure, vacantCell)) {
-            // If cell is on same diag as figure - allow, otherwise - not
-            let k = Math.abs((figure.row * 10 + figure.col) - (vacantCell.row * 10 + vacantCell.col))
-
-            return (0 === (k % 11)) || (0 === (k % 9))
+            return this._isOnTheSameDiagonal(figure, vacantCell)
         }
 
         return false
@@ -476,7 +478,7 @@ export default class Board  extends Observer
      * 
      * @returns {Array}
      */
-    _getVacantCellsAfterEnemy(figure, enemy) {
+    _getVacantCellsAfterEnemy(figure, enemy, checkMyStep = false) {
         let rowStep = Math.sign(enemy.row - figure.row)
         let colStep = Math.sign(enemy.col - figure.col)
 
@@ -500,6 +502,7 @@ export default class Board  extends Observer
         ) + 1
 
         let foundVacantCells = []
+        let foundTheOnlyPossibleCells = []
 
         for (let i = 0; i < steps; i++) {
             if (!this._isWhiteCell(row, col) && this._cells[row]) {
@@ -510,6 +513,27 @@ export default class Board  extends Observer
                 }
 
                 if (cell instanceof VacantCell) {
+                    // If there are enemies that can be beaten from one of the cell on our way - we should only jump to that cell
+                    let virtualFigure = this._createFigure(
+                        cell.row, cell.col, true, figure.color
+                    )
+
+                    if (figure.isQueen) {
+                        virtualFigure.upgradeToQueen()
+                    }
+
+                    if (checkMyStep) {
+                        let possibleEnemies = this._getEnemiesThatCanBeBeatenByFigure(virtualFigure).filter(enemy => {
+                            return !(this._isOnTheSameDiagonal(enemy, figure) && this._isOnTheSameDiagonal(enemy, virtualFigure))
+                        })
+                    
+                        possibleEnemies = possibleEnemies
+
+                        if (possibleEnemies.length) {
+                            foundTheOnlyPossibleCells.push(cell)
+                        }
+                    }
+
                     foundVacantCells.push(cell)
                 }
             }
@@ -518,7 +542,7 @@ export default class Board  extends Observer
             col += colStep
         }
 
-        return foundVacantCells
+        return foundTheOnlyPossibleCells.length ? foundTheOnlyPossibleCells : foundVacantCells
     }
 
     /**
@@ -678,14 +702,11 @@ export default class Board  extends Observer
      * @param {string} winnerColor 
      */
     _endGame(winnerColor) {
-        this.broadcast({
-            type: Board.ACTION_MESSAGE,
-            payload: (
-                winnerColor === Figure.WHITE 
-                    ? MESSAGE_WHITE_WIN
-                    : MESSAGE_BLACK_WIN
-            )
-        })
+        this._log(
+            winnerColor === Figure.WHITE 
+                ? MESSAGE_WHITE_WIN
+                : MESSAGE_BLACK_WIN
+        )
         
         this.broadcast({
             type: Board.ACTION_GAME_OVER,

@@ -1,6 +1,18 @@
 import Figure from "./Figure"
 import VacantCell from "./VacantCell"
 import Observer from './Base/Observer'
+import {
+    MESSAGE_HEY_GO_BEAT_SOMEONE_MORE,
+    MESSAGE_GO_WHITE,
+    MESSAGE_GO_BLACK,
+    MESSAGE_THIS_IS_NOT_YOUR_STEP,
+    MESSAGE_YOU_CANT_GO_HERE,
+    MESSAGE_THIS_IS_NOT_YOUR_FIGURE,
+    MESSAGE_YOU_SHOULD_BEAT,
+    MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE,
+    MESSAGE_WHITE_WIN,
+    MESSAGE_BLACK_WIN
+} from "../GameMessages/Messages"
 
 /** @class */
 export default class Board  extends Observer
@@ -9,19 +21,12 @@ export default class Board  extends Observer
     static BOARD_SIZE = 8
 
     // Actions
-    static ACTION_MESSAGE = 'ACTION_MESSAGE'
-    static ACTION_INIT = 'ACTION_INIT'
-    static ACTION_STEP = 'ACTION_STEP'
-    static ACTION_I_MADE_A_STEP = 'ACTION_I_MADE_A_STEP'
     static ACTION_GAME_OVER = 'ACTION_GAME_OVER'
-    static ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE = 'ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE'
-    static ACTION_MESSAGE_THIS_IS_NOT_YOUR_FIGURE = 'ACTION_MESSAGE_THIS_IS_NOT_YOUR_FIGURE'
-    static ACTION_MESSAGE_YOU_SHOULD_BEAT = 'ACTION_MESSAGE_YOU_SHOULD_BEAT'
-    static ACTION_MESSAGE_YOU_CANT_GO_HERE = 'ACTION_MESSAGE_YOU_CANT_GO_HERE'
-    static ACTION_MESSAGE_THIS_IS_NOT_YOUR_STEP = 'ACTION_MESSAGE_THIS_IS_NOT_YOUR_STEP'
-    static ACTION_MESSAGE_GO_BLACK = 'ACTION_MESSAGE_GO_BLACK'
-    static ACTION_MESSAGE_GO_WHITE = 'ACTION_MESSAGE_GO_WHITE'
-    static ACTION_MESSAGE_HEY_GO_BEAT_SOMEONE_MORE = 'ACTION_MESSAGE_HEY_GO_BEAT_SOMEONE_MORE'
+    static ACTION_INIT = 'ACTION_INIT'
+    static ACTION_I_MADE_A_STEP = 'ACTION_I_MADE_A_STEP'
+    static ACTION_MESSAGE = 'ACTION_MESSAGE'
+    static ACTION_YOU_SHOULD_BEAT = 'ACTION_YOU_SHOULD_BEAT'
+    static ACTION_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE = 'ACTION_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE'
 
     /** @type {number} */
     _rowsCount = (Board.BOARD_SIZE - 2) / 2
@@ -125,7 +130,8 @@ export default class Board  extends Observer
         if (!figure.isCurrentPlayer() && !this._localGame) {
             // If player wants to make a step by enemy figure - he can't
             this.broadcast({
-                type: Board.ACTION_MESSAGE_THIS_IS_NOT_YOUR_FIGURE,
+                type: Board.ACTION_MESSAGE,
+                payload: MESSAGE_THIS_IS_NOT_YOUR_FIGURE
             })
 
             return false
@@ -134,7 +140,8 @@ export default class Board  extends Observer
         if (figure.color !== this._whoseMove) {
             // If player wants to make a step by enemy figure - he can't
             this.broadcast({
-                type: Board.ACTION_MESSAGE_THIS_IS_NOT_YOUR_STEP,
+                type: Board.ACTION_MESSAGE,
+                payload: MESSAGE_THIS_IS_NOT_YOUR_STEP
             })
 
             return false
@@ -146,7 +153,12 @@ export default class Board  extends Observer
         // If there is a figure, that should fight, and it is not the current figure - step denied
         if (figuresThatShouldFight.length && !figuresThatShouldFight.includes(figure)) {
             this.broadcast({
-                type: Board.ACTION_MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE,
+                type: Board.ACTION_MESSAGE,
+                payload: MESSAGE_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE
+            })
+
+            this.broadcast({
+                type: Board.ACTION_YOU_SHOULD_FIGHT_WITH_THIS_FIGURE,
                 payload: figuresThatShouldFight
             })
             
@@ -176,7 +188,12 @@ export default class Board  extends Observer
             }
 
             this.broadcast({
-                type: Board.ACTION_MESSAGE_YOU_SHOULD_BEAT,
+                type: Board.ACTION_MESSAGE,
+                payload: MESSAGE_YOU_SHOULD_BEAT
+            })
+
+            this.broadcast({
+                type: Board.ACTION_YOU_SHOULD_BEAT,
                 payload: theOnlyPossibleSteps
             })
 
@@ -189,7 +206,8 @@ export default class Board  extends Observer
         }
 
         this.broadcast({
-            type: Board.ACTION_MESSAGE_YOU_CANT_GO_HERE,
+            type: Board.ACTION_MESSAGE,
+            payload: MESSAGE_YOU_CANT_GO_HERE
         })
 
         return false
@@ -273,31 +291,29 @@ export default class Board  extends Observer
         // If there are no more moves - change player, or if player beat the enemy and there are some more - player should continue his fight
         if (this._deadFigures.length && this._getEnemiesThatCanBeBeatenByFigure(figure).length) {
             this.broadcast({
-                type: Board.ACTION_MESSAGE_HEY_GO_BEAT_SOMEONE_MORE,
+                type: Board.ACTION_MESSAGE,
+                payload: MESSAGE_HEY_GO_BEAT_SOMEONE_MORE
             })
         } else {
             if (Figure.WHITE === this._whoseMove) {
                 this._whoseMove = Figure.BLACK
 
                 this.broadcast({
-                    type: Board.ACTION_MESSAGE_GO_BLACK,
+                    type: Board.ACTION_MESSAGE,
+                    payload: MESSAGE_GO_BLACK
                 })
             } else {
                 this._whoseMove = Figure.WHITE
 
                 this.broadcast({
-                    type: Board.ACTION_MESSAGE_GO_WHITE,
+                    type: Board.ACTION_MESSAGE,
+                    payload: MESSAGE_GO_WHITE
                 })
             }
 
             this._removeDeadFiguresFromTheBoard()
             this._checkIfSomebodyWins()
         }
-
-        this.broadcast({
-            type: Board.ACTION_STEP,
-            payload: this._cells
-        })
 
         if (figure.isCurrentPlayer()) {   
             this.broadcast({
@@ -662,6 +678,15 @@ export default class Board  extends Observer
      * @param {string} winnerColor 
      */
     _endGame(winnerColor) {
+        this.broadcast({
+            type: Board.ACTION_MESSAGE,
+            payload: (
+                winnerColor === Figure.WHITE 
+                    ? MESSAGE_WHITE_WIN
+                    : MESSAGE_BLACK_WIN
+            )
+        })
+        
         this.broadcast({
             type: Board.ACTION_GAME_OVER,
             payload: winnerColor

@@ -1,9 +1,10 @@
-import { FIGURE_MOVED, SELECT_GAME, SET_GAME_LIST } from "./types"
+import { FIGURE_MOVED, SELECT_GAME, SET_GAME_LIST, SET_GAME_STEPS } from "./types"
 
 const initialState = {
     cells: {},
     gameList: [],
-    game: null
+    game: null,
+    steps: [],
 }
 
 export const gameReducer = (state = initialState, action) => {
@@ -16,6 +17,9 @@ export const gameReducer = (state = initialState, action) => {
         
         case SET_GAME_LIST:
             return {...state, gameList: action.payload}
+            
+        case SET_GAME_STEPS:
+            return {...state, steps: action.payload}
 
         default:
             return state

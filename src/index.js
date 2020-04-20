@@ -1,20 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, compose } from 'redux';
-import {Provider} from 'react-redux'
-import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import createSagaMiddleware from 'redux-saga'
+import * as serviceWorker from './serviceWorker'
 
 import './index.css';
 import App from './App';
 
 import { rootReducer } from './redux/root-reducer';
+import { watchMultiplayerActions } from './redux/multiplayer-sagas'
+import { watchMessagesActions } from './redux/messages-sagas'
+
+const sagaMiddleware = createSagaMiddleware()
 
 const store = createStore(
   rootReducer,
-  compose(
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  composeWithDevTools(
+    applyMiddleware(sagaMiddleware)
   )
 )
+
+sagaMiddleware.run(watchMultiplayerActions)
+sagaMiddleware.run(watchMessagesActions)
 
 const app = (
   <React.StrictMode>

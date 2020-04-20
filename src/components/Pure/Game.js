@@ -4,7 +4,6 @@ import moment from "moment"
 export default class Game 
 {
     /**
-     * 
      * @param {string} name 
      * @param {number} userId 
      * @param {number} id 

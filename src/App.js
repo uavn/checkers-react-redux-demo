@@ -24,9 +24,8 @@ function App({game, loading}) {
       {content}
 
       <div className="credits">
-        <h4>Checkers Game</h4>
-        JS Demo project.<br/>
-        JavaScript, React & Redux<br/>
+        <h4>Checkers Game Demo Project</h4>
+        JS, React & Redux, Saga<br/>
         MongoDB Atlas/MongoDB Stitch<br/>
         Single Player/Multiplayer<br/>
 

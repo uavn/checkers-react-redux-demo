@@ -1,60 +1,22 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import './GameList.css'
-import {selectGame, setGameList, showLoader, hideLoader, alertMessage} from './../../redux/actions'
-import MultiplayerService from '../Pure/MultiplayerService'
+import {
+    selectGame,
+    setGameList,
+    showLoader,
+    hideLoader,
+    alertMessage,
+    multiplayerListHeartbeat,
+    multiplayerCreateGame,
+    multiplayerStartGame
+} from './../../redux/actions'
 
 /** @class */
 class GameList extends React.Component
 {
-    /** @type {MultiplayerService} */
-    multiplayerService
-    
     componentDidMount() {
-        this.initMultiplayer()
-    }
-
-    componentWillUnmount() {
-        this.multiplayerService.unsubscribeAll()
-    }
-
-    initMultiplayer() {
-        this.multiplayerService = new MultiplayerService()
-
-        let eventCallbackMap = {
-            [MultiplayerService.ACTION_GAMES_ADDED]: (games) => {
-                if (games) {
-                    this.props.setGameList(games)
-                }
-                
-                this.props.hideLoader()
-            },
-
-            [MultiplayerService.ACTION_YOUR_GAME_ADDED]: (payload) => {
-                // You craeted a game
-                this.props.setGameList(payload)
-                this.props.hideLoader()
-            },
-
-            [MultiplayerService.ACTION_GAME_STARTED]: (game) => {
-                // You connected to a game or somebody connected to your game
-                this.props.selectGame(game)
-                this.props.hideLoader()
-            },
-            
-            [MultiplayerService.ACTION_ERROR_APPEAR]: (payload) => {
-                alert(payload || 'An error occured')
-            },
-        }
-
-        this.multiplayerService.subscribe((action) => {
-            if (typeof eventCallbackMap[action.type] !== 'undefined')  {
-                eventCallbackMap[action.type](action.payload)
-            }
-        })
-
-        this.props.showLoader()
-        this.multiplayerService.initListHeartbeat()
+        this.props.multiplayerListHeartbeat()
     }
 
     /**
@@ -63,12 +25,7 @@ class GameList extends React.Component
     createGame(e) {
         e.preventDefault()
 
-        let name = prompt('Назва гри')
-
-        if (name && name.trim()) {
-            this.props.showLoader()
-            this.multiplayerService.createGame(name)
-        }
+        this.props.multiplayerCreateGame(prompt('Назва гри'))
     }
 
     /**
@@ -90,7 +47,7 @@ class GameList extends React.Component
     startGame(e, game) {
         e.preventDefault()
 
-        this.multiplayerService.startGame(game)
+        this.props.multiplayerStartGame(game)
     }
 
     render() {
@@ -129,5 +86,8 @@ export default connect(mapStateToProps, {
     setGameList,
     showLoader,
     hideLoader,
-    alertMessage
+    alertMessage,
+    multiplayerListHeartbeat,
+    multiplayerCreateGame,
+    multiplayerStartGame,
 })(GameList)
